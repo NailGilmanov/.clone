@@ -1,3 +1,3 @@
 # .clone
-# LETS CLONE YOUSELF  
+* LETS CLONE YOUSELF  
 QR-generator 
