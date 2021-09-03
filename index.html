@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode</title>
+
+    <style>
+        body {
+            margin: 3%;
+            background: #0095dd;
+        }
+
+        h1 {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 80px;
+            color: white;
+            line-height: 50px;
+            margin-bottom: 15px;
+        }
+
+        tt {
+            color: white;
+            font-size: 30px;
+            padding-bottom: 100px;
+        }
+
+        #barcode {
+            width: 148px;
+            height: 156px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .inputs {
+            height: 152px;
+            background-color: white;
+            border: 1.5px solid black;
+            border-radius: 15px;
+            width: 310px;
+            overflow: hidden
+        }
+
+        input {
+            border: 0;
+            height: 49px;
+            width: 100%;
+            font-size: 15px;
+            padding-left: 10px;
+        }
+
+        input:active, :hover, :focus {
+            outline: 0;
+            outline-offset: 0;
+        }
+
+        .barcode {
+            border: 3px solid black;
+            box-sizing: border-box;
+        }
+           
+        .content {
+            margin-top: 3px;
+            margin-left: 3px;
+            width: 136px;
+            height: 144px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+           
+        .content__bit {
+            width: 8px;
+            height: 8px;
+        }
+           
+        .content__bit_one {
+           background: black;
+        }
+    </style>
+</head>
+<body>
+    <h1><span style="color: black;">.c</span>lone</h1>
+    <tt>LETS CLONE YOURSELF</tt><br><br><br>
+    <div class="inputs">
+        <input id='sex' type="text" placeholder="sex">
+        <input id='name' style="border-top: 1px solid lightgrey;" type="text" placeholder="name">
+        <input id='id' style="border-top: 1px solid lightgrey;" type="text" placeholder="identification (10 symbols)" maxlength="10">
+    </div><br><br>
+    <tt style="font-size: 25px;">BARCODE:</tt><br><br>
+    <div id='barcode'></div>
+
+    <script>
+        let inputSex = document.getElementById('sex');
+        let inputName = document.getElementById('name');
+        let inputId = document.getElementById('id');
+
+        inputId.addEventListener('change', () => {
+            cloneInfo["id"] = inputId.value
+            renderBarcode(cloneInfo, barcode)
+        })
+
+        inputName.addEventListener('change', () => {
+            cloneInfo["name"] = inputName.value
+            renderBarcode(cloneInfo, barcode)
+        })
+
+        inputSex.addEventListener('change', () => {
+            cloneInfo["sex"] = inputSex.value
+            renderBarcode(cloneInfo, barcode)
+        })
+
+        const cloneInfo = {
+            "sex": "female",
+            "id": "0owrgqqwfw",
+            "name": "Dazdraperma Petrovna"
+        }
+
+        const barcode = document.getElementById('barcode');
+
+        function renderBarcode(cloneInfo, element) {
+            function charToByte(char) {
+            return char.charCodeAt(0);
+        }
+
+        function byteToString(byte) {
+            return byte.toString(2).padStart(8, '0');
+        }
+
+        let dataString =
+            (cloneInfo.sex === 'female' ? '0' : '1') +
+            cloneInfo.id.split('').map(charToByte).map(byteToString).join('') +
+            cloneInfo.name.padEnd(26, ' ').split('').map(charToByte).map(byteToString).join('');
+    
+        const contentElId = 'content-' + Math.random();
+        element.style.display = 'flex';
+        element.innerHTML = `
+            <div class="content" id="${contentElId}"></div>
+        `;
+
+        const contentDiv = document.getElementById(contentElId);
+        element.className += ' barcode';
+
+        dataString
+            .split('')
+            .forEach((bit) => {
+                const bitDiv = document.createElement('div');
+                bitDiv.className = 'content__bit content__bit_' + (bit === '0' ? 'zero' : 'one');
+                contentDiv.appendChild(bitDiv);
+            });
+
+            for (let i = 0; i < 17; i++) {
+                let sum = 0;
+
+                for (let j = i; j < 17 ** 2; j += 17) {
+                    sum += parseInt(dataString[j], 2);
+                }
+
+                const check = 0;
+                const bitDiv = document.createElement('div');
+                bitDiv.className = 'content__bit content__bit_' + (sum % 2 === 0 ? 'zero' : 'one');
+                contentDiv.appendChild(bitDiv);
+            }
+        }
+
+        renderBarcode(cloneInfo, barcode)
+    </script>
+</body>
+</html>
